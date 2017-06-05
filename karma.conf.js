@@ -12,17 +12,17 @@ module.exports = function (config) {
     singleRun: true, // Continuous Integration mode, if true, Karma captures browsers, runs the tests and exits
     frameworks: ['jasmine'], // frameworks to use, available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     browserNoActivityTimeout: 100000,
-    
+
+      exclude: [], // list of files to exclude
+
+      // preprocess matching files before serving them to the browser, available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+      preprocessors: {
+          'spec.bundle.js': ['webpack', 'sourcemap']
+      },
+
     files: [ // list of files / patterns to load in the browser
       { pattern: './spec.bundle.js', watched: false }
     ],
-    
-    exclude: [], // list of files to exclude
-
-    // preprocess matching files before serving them to the browser, available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'spec.bundle.js': ['webpack', 'sourcemap']
-    },
 
     // webpack config
     webpack: {
@@ -37,7 +37,7 @@ module.exports = function (config) {
         ]
       },
       stats: { colors: true, reasons: true },
-      debug: false
+      debug: true
     },
     webpackServer: {
       noInfo: true //please don't spam the console when running in karma!

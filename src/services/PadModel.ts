@@ -70,11 +70,11 @@ export class PadModel {
         this.clientId = uuid.v1();
 
         this.activePeers = new Set<string>();
-        this.deadPeers = new Set<string>();
-
         this.users = new Map<string, UserModel>();
 
         this.mimeType = new BehaviorSubject(null);
+
+        this.deadPeers = new Set<string>();
         this.mostRecentCursors = null;
 
         this.outgoingUserBroadcasts = new Subject<Message>();
@@ -191,6 +191,7 @@ export class PadModel {
         this.signaler.on('disconnect', () => { this.log('disconnected from signaler'); });
 
         this.mimeType.subscribe(type => {
+            this.log('Type: ', type);
             if (type) this.firePadUpdate(true);
         });
 
@@ -205,7 +206,6 @@ export class PadModel {
         this.users.clear();
 
         if (this.signaler) this.signaler.close();
-
         this.mimeType.complete();
         this.localEdits.complete();
         this.remoteEdits.complete();
@@ -218,6 +218,10 @@ export class PadModel {
 
     isStarted(): boolean {
         return !!this.signaler;
+    }
+
+    onChatSend() {
+        this.sendChatMessage('hello');
     }
 
     /* private methods */
@@ -296,6 +300,7 @@ export class PadModel {
     };
 
     private onPadUpdate = (update: PadUpdate) => {
+        this.log('Received update: ', update);
         if (update.mimeType !== undefined && update.mimeType !== this.mimeType.value) {
             this.mimeType.next(update.mimeType);
         }
@@ -407,8 +412,15 @@ export class PadModel {
         this.debouncedPadUpdate();
     }
 
+    private sendChatMessage(message: string) {
+        this.log('CHAT MESSAGE SENDING: ', message);
+        this.outgoingUserBroadcasts.next({ type: 'INCOMING_CHAT', data: message});
+    }
+
     private sendUpdateNow(isLightweight: boolean) {
-        this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: this.buildPadUpdate(isLightweight) });
+        let temp =  this.buildPadUpdate(isLightweight);
+        this.log('Sending update : ', temp);
+        this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: temp });
     }
 
     private onCompactionTick = () => {

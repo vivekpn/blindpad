@@ -155,5 +155,12 @@
             </pad-users>
         </pad-toolbar>
         <editor [pad]="getPad()"></editor>
+        <div class="chat">
+            <ul class="messages"></ul>
+            <input class="chat_input"/>
+            <button class="send_button" (click)="onChatSendClick()"> Send </button>
+        </div>
+
+
     </pad-body>
 </pad-page>

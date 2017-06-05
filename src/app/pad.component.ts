@@ -128,6 +128,10 @@ export class PadComponent implements OnInit, OnDestroy {
         this.visibleModeChoices = null;
     }
 
+    onChatSendClick() {
+       this.getPad().onChatSend();
+    }
+
     /* audio setup */
 
     isChromeOnMac(): boolean { return !!bowser.chrome && !!bowser['mac']; }
