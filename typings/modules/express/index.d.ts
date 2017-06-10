@@ -1710,3 +1710,7 @@ declare module 'express' {
 import express = require('~express/lib/express');
 export = express;
 }
+
+declare module 'hackerrank' {
+    import hackerrank = require('hackerrank-node-wrapper/dist/');
+}

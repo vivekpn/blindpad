@@ -14,6 +14,7 @@ import { UserModel } from '../services/UserModel';
 import { getDescribedNoun } from '../util/Names';
 import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
+import hackerrank = require('hackerrank');
 
 enum PadView {
     Welcome,
