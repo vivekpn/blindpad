@@ -17,7 +17,7 @@ import {
     Message,
     ConnectionRequest, ConnectionResponse,
     UserStatusRequest, UserStatusResponse,
-    PadUpdate
+    PadUpdate, ChatMessage
 } from '../signaler/Protocol';
 
 const PEER_CONFIG: RTCConfiguration = {
@@ -75,6 +75,7 @@ export class UserModel {
     private dechunker: Dechunker;
 
     private broadcastSub: Subscription;
+    private chatstub: Subscription;
     private heartbeatSub: Subscription;
     private lastMessageTime: number;
 
@@ -101,6 +102,7 @@ export class UserModel {
         this.dechunker = new Dechunker();
 
         this.broadcastSub = null;
+        this.chatstub = null;
         this.heartbeatSub = null;
         this.lastMessageTime = null;
     }
@@ -158,6 +160,10 @@ export class UserModel {
 
         this.broadcastSub.unsubscribe();
         this.broadcastSub = null;
+
+        this.chatstub.unsubscribe();
+        this.chatstub = null;
+
         this.heartbeatSub.unsubscribe();
         this.heartbeatSub = null;
 
@@ -179,6 +185,7 @@ export class UserModel {
 
     private setupSubs() {
         this.broadcastSub = this.pad.getOutoingUserBroadcasts().subscribe(msg => this.messagesOut.next(msg));
+        this.chatstub = this.pad.getChatMessageBroadcasts().subscribe(msg => this.messagesOut.next(msg));
         this.heartbeatSub = interval(HEARTBEAT_FREQUENCY_MS).subscribe(time => {
             this.sendHeartbeatRequest();
         });
@@ -201,7 +208,7 @@ export class UserModel {
 
         // when we get a message (that somebody local wants to send) send it off to our chunker
         this.messagesOut
-            .filter(message => message.type !== ConnectionRequest.messageType && message.type !== ConnectionResponse.messageType) // these types are sent to the signaler instead of the webrtc channel
+            .filter(message => message.type !== ConnectionRequest.messageType && message.type !== ConnectionResponse.messageType && message.type !== ChatMessage.messageType ) // these types are sent to the signaler instead of the webrtc channel
             .subscribe(message => {
                 const str = JSON.stringify(message);
                 this.chunker.messages.next(str);
@@ -230,6 +237,7 @@ export class UserModel {
         this.getMessagesIn(UserStatusRequest.messageType).subscribe((request: UserStatusRequest) => {
             this.sendHeartbeatResponse();
         });
+
         this.getMessagesIn(UserStatusResponse.messageType).subscribe((response: UserStatusResponse) => {
             if (this.name.value !== response.name) {
                 this.pad.log('Received name from ', response.srcId, ' / ', response.name);

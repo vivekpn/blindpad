@@ -13,7 +13,7 @@ import {
     PeersRequest, PeersUpdate,
     ConnectionRequest, ConnectionResponse,
     PadEdit, PadUpdate,
-    CursorMap
+    CursorMap, ChatMessage
 } from '../signaler/Protocol';
 import { UserModel } from './UserModel';
 import { BlindpadService } from './blindpad.service';
@@ -57,6 +57,8 @@ export class PadModel {
     private localCursors: Subject<CursorMap>;
     private remoteCursors: Subject<CursorMap>;
 
+    private chatmessage: Subject<Message>;
+
     private debouncedPadUpdate: () => void;
     private debouncedIsLightweight = true;
 
@@ -82,7 +84,7 @@ export class PadModel {
         this.remoteEdits = new Subject<PadEdit[]>();
         this.localCursors = new Subject<CursorMap>();
         this.remoteCursors = new Subject<CursorMap>();
-
+        this.chatmessage = new Subject<Message>();
         this.localEdits.subscribe(this.onLocalEdits);
         this.localCursors.subscribe(this.onLocalCursors);
 
@@ -173,6 +175,10 @@ export class PadModel {
             this.updateUsers(data.activePeers, data.deadPeers);
         });
 
+        this.signaler.on(ChatMessage.messageType, (data: string) => {
+            this.log(ChatMessage.messageType, data);
+        });
+
         this.signaler.on(ConnectionRequest.messageType, (data: ConnectionRequest) => {
             this.log(ConnectionRequest.messageType, data);
             if (!this.isValidConnectionMessage(data)) return;
@@ -224,6 +230,10 @@ export class PadModel {
         this.sendChatMessage('hello');
     }
 
+    getChatMessageBroadcasts(): Observable<Message> {
+        return this.chatmessage;
+    }
+
     /* private methods */
 
     private updateUsers(actives: string[], deads: string[]) {
@@ -253,6 +263,8 @@ export class PadModel {
                     if (this.activePeers.has(peerId)) {
                         user.getMessagesOut(ConnectionRequest.messageType).subscribe(this.signalRequest);
                         user.getMessagesOut(ConnectionResponse.messageType).subscribe(this.signalResponse);
+                        user.getMessagesOut(ChatMessage.messageType).subscribe(this.chatBroadcast);
+                        user.getMessagesIn(ChatMessage.messageType).subscribe(this.onChatMessage);
                         user.getMessagesIn(PadUpdate.messageType).subscribe(this.onPadUpdate);
                     }
                 }
@@ -297,6 +309,10 @@ export class PadModel {
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
             this.firePadUpdate(false);
         }
+    };
+
+    private onChatMessage = (message: string) => {
+        this.log('Received chat message: ', message);
     };
 
     private onPadUpdate = (update: PadUpdate) => {
@@ -414,7 +430,7 @@ export class PadModel {
 
     private sendChatMessage(message: string) {
         this.log('CHAT MESSAGE SENDING: ', message);
-        this.outgoingUserBroadcasts.next({ type: 'INCOMING_CHAT', data: message});
+        this.outgoingUserBroadcasts.next({ type: ChatMessage.messageType, data: message});
     }
 
     private sendUpdateNow(isLightweight: boolean) {
@@ -461,7 +477,7 @@ export class PadModel {
         req.timeout = PEER_TIMEOUT_POLL_MS / 2;
         req.open('GET', `/index.html?t=${Date.now()}`, true); // prevent caching
         req.send();
-    }
+    };
 
     private getResponsivePeers(): Array<UserModel> {
         return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && !user.isUnavailable());
@@ -522,6 +538,9 @@ export class PadModel {
 
     private signalResponse = (res: ConnectionResponse) => {
         this.signaler.emit(ConnectionResponse.messageType, res);
+    };
+    private chatBroadcast = (message: Object) => {
+        this.signaler.emit(ChatMessage.messageType, message);
     };
 
     private isValidMessage(msg: PeersRequest | PeersUpdate | ConnectionRequest | ConnectionResponse): boolean {

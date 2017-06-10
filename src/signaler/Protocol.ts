@@ -134,6 +134,10 @@ export class ConnectionResponse {
  * TODO: explain how it works
  */
 
+export class ChatMessage {
+    static messageType = 'ChatMessage';
+}
+
 export class PadUpdate {
     static messageType = 'PadUpdate';
 
