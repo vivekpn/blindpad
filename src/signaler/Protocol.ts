@@ -136,6 +136,20 @@ export class ConnectionResponse {
 
 export class ChatMessage {
     static messageType = 'ChatMessage';
+    /**
+     * Who is sending this chat message.'
+     */
+    srcId: string;
+
+    /**
+     * What pad is this a chat message?
+     */
+    padId: string;
+
+    /**
+     * What is the message?
+     */
+    message: string;
 }
 
 export class PadUpdate {

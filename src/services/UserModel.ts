@@ -17,7 +17,7 @@ import {
     Message,
     ConnectionRequest, ConnectionResponse,
     UserStatusRequest, UserStatusResponse,
-    PadUpdate, ChatMessage
+    PadUpdate
 } from '../signaler/Protocol';
 
 const PEER_CONFIG: RTCConfiguration = {
@@ -208,7 +208,7 @@ export class UserModel {
 
         // when we get a message (that somebody local wants to send) send it off to our chunker
         this.messagesOut
-            .filter(message => message.type !== ConnectionRequest.messageType && message.type !== ConnectionResponse.messageType && message.type !== ChatMessage.messageType ) // these types are sent to the signaler instead of the webrtc channel
+            .filter(message => message.type !== ConnectionRequest.messageType && message.type !== ConnectionResponse.messageType ) // these types are sent to the signaler instead of the webrtc channel
             .subscribe(message => {
                 const str = JSON.stringify(message);
                 this.chunker.messages.next(str);

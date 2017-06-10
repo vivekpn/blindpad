@@ -175,7 +175,7 @@ export class PadModel {
             this.updateUsers(data.activePeers, data.deadPeers);
         });
 
-        this.signaler.on(ChatMessage.messageType, (data: string) => {
+        this.signaler.on(ChatMessage.messageType, (data: ChatMessage) => {
             this.log(ChatMessage.messageType, data);
         });
 
@@ -429,8 +429,12 @@ export class PadModel {
     }
 
     private sendChatMessage(message: string) {
+        let temp = new ChatMessage();
+        temp.message = message;
+        temp.srcId = this.clientId;
+        temp.padId = this.padId;
         this.log('CHAT MESSAGE SENDING: ', message);
-        this.outgoingUserBroadcasts.next({ type: ChatMessage.messageType, data: message});
+        this.chatmessage.next({ type: ChatMessage.messageType, data: temp});
     }
 
     private sendUpdateNow(isLightweight: boolean) {
@@ -539,7 +543,7 @@ export class PadModel {
     private signalResponse = (res: ConnectionResponse) => {
         this.signaler.emit(ConnectionResponse.messageType, res);
     };
-    private chatBroadcast = (message: Object) => {
+    private chatBroadcast = (message: ChatMessage) => {
         this.signaler.emit(ChatMessage.messageType, message);
     };
 
