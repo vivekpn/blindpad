@@ -32,6 +32,7 @@ const PEER_TIMEOUT_POLL_MS = 5000;
 const COMPACTION_POLL_MS = 1000;
 
 export class PadModel {
+
     private useLog = true;
 
     private clientId: string;
