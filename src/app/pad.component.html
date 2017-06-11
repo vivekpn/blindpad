@@ -157,7 +157,7 @@
         </pad-toolbar>
         <editor [pad]="getPad()"></editor>
         <div style="width: 15pc">
-            <textarea style="width: 15pc; height: 20pc">{{chatHistory}}</textarea>
+            <textarea style="width: 15pc; height: 20pc">{{getChatHistory()}}</textarea>
             <input #name/>
             <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
         </div>

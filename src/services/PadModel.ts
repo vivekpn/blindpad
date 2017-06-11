@@ -32,6 +32,7 @@ const PEER_TIMEOUT_POLL_MS = 5000;
 const COMPACTION_POLL_MS = 1000;
 
 export class PadModel {
+    chatHistory: string = '';
 
     private useLog = true;
 
@@ -228,6 +229,7 @@ export class PadModel {
     }
 
     onChatSend(message: string) {
+        this.chatHistory += message + '\n';
         this.sendChatMessage(message);
     }
 
@@ -313,6 +315,7 @@ export class PadModel {
     };
 
     private onChatMessage = (message: string) => {
+        this.chatHistory += message + '\n';
         this.log('Received chat message: ', message);
     };
 
