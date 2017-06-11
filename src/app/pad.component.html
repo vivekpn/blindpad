@@ -158,7 +158,7 @@
         <editor [pad]="getPad()"></editor>
         <div>
             <input #name/>
-            <button (click)="onChatSendClick(name.value)"> Send </button>
+            <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
         </div>
 
 
