@@ -226,8 +226,8 @@ export class PadModel {
         return !!this.signaler;
     }
 
-    onChatSend() {
-        this.sendChatMessage('hello');
+    onChatSend(message: string) {
+        this.sendChatMessage(message);
     }
 
     getChatMessageBroadcasts(): Observable<Message> {

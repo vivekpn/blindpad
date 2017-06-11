@@ -35,6 +35,7 @@ export class PadComponent implements OnInit, OnDestroy {
 
     PadView = PadView;
     visibleModeChoices: EditorMode[] = null;
+    chatinput: string;
 
     private routeSub: Subscription;
     private randomPadId: string;
@@ -128,8 +129,8 @@ export class PadComponent implements OnInit, OnDestroy {
         this.visibleModeChoices = null;
     }
 
-    onChatSendClick() {
-       this.getPad().onChatSend();
+    onChatSendClick(message: string) {
+        this.getPad().onChatSend(message);
     }
 
     /* audio setup */

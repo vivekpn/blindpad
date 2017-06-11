@@ -136,6 +136,7 @@
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
             <a class="invert" routerLink="/about">about</a>
+            <a class="invert">chat</a>
             <button class="mode-button" *ngIf="!!getPadMode()" (click)="onModeButtonClick()">
                 {{ getPadMode().name }}
             </button>
@@ -155,10 +156,9 @@
             </pad-users>
         </pad-toolbar>
         <editor [pad]="getPad()"></editor>
-        <div class="chat">
-            <ul class="messages"></ul>
-            <input class="chat_input"/>
-            <button class="send_button" (click)="onChatSendClick()"> Send </button>
+        <div>
+            <input #name/>
+            <button (click)="onChatSendClick(name.value)"> Send </button>
         </div>
 
 
