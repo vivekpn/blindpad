@@ -315,7 +315,7 @@ export class PadModel {
     };
 
     private onChatMessage = (message: string) => {
-        this.chatHistory += message + '\n';
+        this.chatHistory += message['message'] + '\n';
         this.log('Received chat message: ', message);
     };
 
