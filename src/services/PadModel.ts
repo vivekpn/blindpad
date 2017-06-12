@@ -229,7 +229,7 @@ export class PadModel {
     }
 
     onChatSend(message: string) {
-        this.chatHistory += message + '\n';
+        this.chatHistory += 'You' + ': ' + message + '\n';
         this.sendChatMessage(message);
     }
 
@@ -315,9 +315,13 @@ export class PadModel {
     };
 
     private onChatMessage = (message: string) => {
-        this.chatHistory += message['message'] + '\n';
+        this.chatHistory += this.getScreenName(message['srcId']) + ': ' + message['message'] + '\n';
         this.log('Received chat message: ', message);
     };
+
+    private getScreenName(userId: string): string {
+        return this.users.get(userId).getName().getValue();
+    }
 
     private onPadUpdate = (update: PadUpdate) => {
         this.log('Received update: ', update);
