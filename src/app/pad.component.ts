@@ -32,7 +32,7 @@ enum PadView {
     }
 })
 export class PadComponent implements OnInit, OnDestroy {
-
+    chatEnabled: boolean = false;
     PadView = PadView;
     visibleModeChoices: EditorMode[] = null;
 
@@ -139,6 +139,14 @@ export class PadComponent implements OnInit, OnDestroy {
     /* audio setup */
 
     isChromeOnMac(): boolean { return !!bowser.chrome && !!bowser['mac']; }
+
+    isChatEnabled(): boolean {
+        return this.chatEnabled;
+    }
+
+    toggleChatEnable() {
+        this.chatEnabled = !this.chatEnabled;
+    }
 
     optOutOfVoice() {
         this.media.setOptOut();
