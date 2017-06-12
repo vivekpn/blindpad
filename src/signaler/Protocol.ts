@@ -152,6 +152,47 @@ export class ChatMessage {
     message: string;
 }
 
+export class RunRequest {
+    static messageType = 'RunRequest';
+    /**
+     * Who is sending this run request.'
+     */
+    srcId: string;
+
+    /**
+     * At what time the request was created.
+     */
+    time: string;
+
+    /**
+     * What pad is this a chat message?
+     */
+    padId: string;
+}
+
+export class RunResponse {
+    static messageType = 'RunResponse';
+    /**
+     * Who is sending this run request.'
+     */
+    srcId: string;
+
+    /**
+     * Who's run request are we responding to?
+     */
+    destId: string;
+
+    /**
+     * At what time the run request was created.
+     */
+    requestTime: string;
+
+    /**
+     * What pad is this a chat message?
+     */
+    padId: string;
+}
+
 export class PadUpdate {
     static messageType = 'PadUpdate';
 
