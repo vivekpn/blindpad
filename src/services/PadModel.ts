@@ -13,7 +13,7 @@ import {
     PeersRequest, PeersUpdate,
     ConnectionRequest, ConnectionResponse,
     PadEdit, PadUpdate,
-    CursorMap, ChatMessage
+    CursorMap, ChatMessage, RunResponse, RunRequestResponse
 } from '../signaler/Protocol';
 import { UserModel } from './UserModel';
 import { BlindpadService } from './blindpad.service';
@@ -243,7 +243,7 @@ export class PadModel {
         let runReq = new RunRequest();
         runReq.padId = this.padId;
         runReq.srcId = this.clientId;
-        runReq.time = new Date().getMilliseconds();
+        runReq.time = new Date();
         // The peer waits for N-1 ok (ImOK) messages. Once it gets N-1 ok (ImOK) messages, it starts to execute.
         // In case of timeout do default
         this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
@@ -282,7 +282,8 @@ export class PadModel {
                         user.getMessagesOut(RunRequest.messageType).subscribe(this.runRequestBroadcast);
                         user.getMessagesIn(ChatMessage.messageType).subscribe(this.onChatMessage);
                         user.getMessagesIn(PadUpdate.messageType).subscribe(this.onPadUpdate);
-                        user.getMessagesIn(RunRequest.messageType).subscribe(this.log);
+                        user.getMessagesIn(RunRequest.messageType).subscribe(this.onRunRequest);
+                        user.getMessagesIn(RunResponse.messageType).subscribe(this.onRunResponse);
                     }
                 }
                 this.users.set(peerId, user);
@@ -328,9 +329,24 @@ export class PadModel {
         }
     };
 
-    private onChatMessage = (message: string) => {
-        this.chatHistory += this.getScreenName(message['srcId']) + ': ' + message['message'] + '\n';
+    private onChatMessage = (message: ChatMessage) => {
+        this.chatHistory += this.getScreenName(message.srcId) + ': ' + message.message + '\n';
         this.log('Received chat message: ', message);
+    };
+
+    private onRunRequest = (request: RunRequest) => {
+        this.log('Received run request:', request);
+        let response = new RunResponse();
+        response.srcId = this.clientId;
+        response.padId = request.padId;
+        response.destId = request.srcId;
+        response.requestTime = request.time;
+        response.response = RunRequestResponse.OKAY;
+        this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
+    };
+
+    private onRunResponse = (response: RunResponse) => {
+        this.log('Received response from ', response);
     };
 
     private getScreenName(userId: string): string {

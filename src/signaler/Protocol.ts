@@ -162,7 +162,7 @@ export class RunRequest {
     /**
      * At what time the request was created.
      */
-    time: number;
+    time: Date;
 
     /**
      * What pad is this a chat message?
@@ -170,11 +170,17 @@ export class RunRequest {
     padId: string;
 }
 
+export enum RunRequestResponse {
+    OKAY,
+    NOT_OKAY
+}
+
 export class RunResponse {
     static messageType = 'RunResponse';
     /**
      * Who is sending this run request.'
      */
+
     srcId: string;
 
     /**
@@ -185,12 +191,17 @@ export class RunResponse {
     /**
      * At what time the run request was created.
      */
-    requestTime: string;
+    requestTime: Date;
 
     /**
      * What pad is this a chat message?
      */
     padId: string;
+
+    /**
+     * What is the response;
+     */
+    response: RunRequestResponse;
 }
 
 export class PadUpdate {

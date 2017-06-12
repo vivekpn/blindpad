@@ -331,7 +331,7 @@ export class UserModel {
         req.destId = this.getId();
         req.padId = this.pad.getPadId();
         this.messagesOut.next({ type: UserStatusRequest.messageType, data: req });
-    }
+    };
 
     private sendHeartbeatResponse = (sendPadUpdate = false) => {
         const res = new UserStatusResponse();
