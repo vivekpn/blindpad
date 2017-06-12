@@ -108,6 +108,10 @@ export class PadComponent implements OnInit, OnDestroy {
         }
     }
 
+    run() {
+        //  send a message to all the users
+    }
+
     onModeChoice(choice: EditorMode) {
         if (!choice || !this.hasPad()) {
             this.visibleModeChoices = null;

@@ -160,6 +160,7 @@
             <textarea readonly style="width: 15pc; height: 20pc">{{getChatHistory()}}</textarea>
             <input placeholder="Your message" #name/>
             <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
+            <button style="width: 10pc" (click)="run()"> Run </button>
         </div>
     </pad-body>
 </pad-page>
