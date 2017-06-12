@@ -32,7 +32,7 @@ enum PadView {
     }
 })
 export class PadComponent implements OnInit, OnDestroy {
-    chatEnabled: boolean = false;
+    chatEnabled: boolean = true;
     PadView = PadView;
     visibleModeChoices: EditorMode[] = null;
 
@@ -129,6 +129,10 @@ export class PadComponent implements OnInit, OnDestroy {
     }
 
     onChatSendClick(message: string) {
+        if (message.trim().length === 0) {
+            this.getPad().log('Message is empty. Chat message send failed.');
+            return;
+        }
         this.getPad().onChatSend(message);
     }
 

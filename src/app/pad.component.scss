@@ -91,6 +91,13 @@
           }
         }
 
+        .chat-button {
+          &:after {
+            margin-left: 4px;
+            content: "\25BE";
+          }
+        }
+
         mode-choices {
           position: absolute;
           top: $header-height;
