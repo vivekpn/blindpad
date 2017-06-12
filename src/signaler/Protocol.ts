@@ -162,7 +162,7 @@ export class RunRequest {
     /**
      * At what time the request was created.
      */
-    time: string;
+    time: number;
 
     /**
      * What pad is this a chat message?

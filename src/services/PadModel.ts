@@ -22,6 +22,7 @@ import { diffStrings, DIFF_DELETE, DIFF_INSERT } from '../util/Diff';
 import { interval } from '../util/Observables';
 import { SeededRandom } from '../util/Random';
 import { debounce } from '../util/Debounce';
+import { RunRequest } from '../signaler/Protocol';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -237,6 +238,17 @@ export class PadModel {
         return this.chatmessage;
     }
 
+    createRunRequest() {
+        // send a request to all the users
+        let runReq = new RunRequest();
+        runReq.padId = this.padId;
+        runReq.srcId = this.clientId;
+        runReq.time = new Date().getMilliseconds();
+        // The peer waits for N-1 ok (ImOK) messages. Once it gets N-1 ok (ImOK) messages, it starts to execute.
+        // In case of timeout do default
+        this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
+    }
+
     /* private methods */
 
     private updateUsers(actives: string[], deads: string[]) {
@@ -267,8 +279,10 @@ export class PadModel {
                         user.getMessagesOut(ConnectionRequest.messageType).subscribe(this.signalRequest);
                         user.getMessagesOut(ConnectionResponse.messageType).subscribe(this.signalResponse);
                         user.getMessagesOut(ChatMessage.messageType).subscribe(this.chatBroadcast);
+                        user.getMessagesOut(RunRequest.messageType).subscribe(this.runRequestBroadcast);
                         user.getMessagesIn(ChatMessage.messageType).subscribe(this.onChatMessage);
                         user.getMessagesIn(PadUpdate.messageType).subscribe(this.onPadUpdate);
+                        user.getMessagesIn(RunRequest.messageType).subscribe(this.log);
                     }
                 }
                 this.users.set(peerId, user);
@@ -551,6 +565,11 @@ export class PadModel {
     private signalResponse = (res: ConnectionResponse) => {
         this.signaler.emit(ConnectionResponse.messageType, res);
     };
+
+    private runRequestBroadcast = (request: RunRequest) => {
+        this.signaler.emit(RunRequest.messageType, request);
+    };
+
     private chatBroadcast = (message: ChatMessage) => {
         this.signaler.emit(ChatMessage.messageType, message);
     };

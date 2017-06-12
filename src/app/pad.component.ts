@@ -14,7 +14,6 @@ import { UserModel } from '../services/UserModel';
 import { getDescribedNoun } from '../util/Names';
 import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
-// import {RunRequest} from "../signaler/Protocol";
 
 enum PadView {
     Welcome,
@@ -110,12 +109,7 @@ export class PadComponent implements OnInit, OnDestroy {
     }
 
     run() {
-        // send a request to all the users
-//        RunRequest runReq = new RunRequest();
-
-        // The peer waits for N-1 ok (ImOK) messages. Once it gets N-1 ok (ImOK) messages, it starts to execute.
-
-        // Incase of timeout do default
+        this.getPad().createRunRequest();
     }
 
     onModeChoice(choice: EditorMode) {
