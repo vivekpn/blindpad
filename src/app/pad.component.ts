@@ -15,7 +15,7 @@ import { getDescribedNoun } from '../util/Names';
 import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
 import { RunStatus } from '../services/PadModel';
-// import {RunResponse} from "../signaler/Protocol";
+import {RunRequestResponse} from '../signaler/Protocol';
 
 enum PadView {
     Welcome,
@@ -221,9 +221,9 @@ export class PadComponent implements OnInit, OnDestroy {
         this.getPad().setPendingRequest(false);
         this.getPad().log(runresponse);
         if (runresponse === 'OKAY') {
-            // Do something
+            this.getPad().userInputResponse(RunRequestResponse.OKAY);
         } else {
-            // Do something else
+            this.getPad().userInputResponse(RunRequestResponse.NOT_OKAY);
         }
     }
 
