@@ -23,6 +23,7 @@ import { interval } from '../util/Observables';
 import { SeededRandom } from '../util/Random';
 import { debounce } from '../util/Debounce';
 import { RunRequest } from '../signaler/Protocol';
+// import {timeout} from 'rxjs/operator/timeout';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -116,7 +117,7 @@ export class PadModel {
     getUsers(): Map<string, UserModel> { return this.activeUsers; }
     getAllUsers(): Map<string, UserModel> { return this.users; }
     log(...msg: any[]) { if (this.useLog) console.log('', ...msg); } // tslint:disable-line
-
+    debug(...msg: any[]) { if (this.useLog) console.debug('', ...msg); } // tslint:disable-line
     isSignalerConnected(): boolean { return this.signaler && this.signaler.connected; }
     getOutoingUserBroadcasts(): Observable<Message> { return this.outgoingUserBroadcasts; }
     getLocalEdits(): Observer<PadEdit[]> { return this.localEdits; }
@@ -251,13 +252,20 @@ export class PadModel {
 
     createRunRequest() {
         // send a request to all the users
+        this.currentRunStatus = RUN_REQUESTED;
         let runReq = new RunRequest();
         runReq.padId = this.padId;
         runReq.srcId = this.clientId;
         runReq.time = new Date();
+        this.runResponseCount = 0;
+
         // The peer waits for N-1 ok (ImOK) messages. Once it gets N-1 ok (ImOK) messages, it starts to execute.
         // In case of timeout do default
         this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
+        if (this.canChangeStatusToRunning()) {
+            this.currentRunStatus = RUNNING;
+            this.log('Running the request.');
+        }
     }
 
     getCurrentRunStatus(): RunStatus {
@@ -356,25 +364,38 @@ export class PadModel {
         response.padId = request.padId;
         response.destId = request.srcId;
         response.requestTime = request.time;
-        response.response = RunRequestResponse.OKAY;
+        if (this.currentRunStatus === RUNNING) {
+            response.response = RunRequestResponse.NOT_OKAY;
+        } else if ( this.currentRunStatus === RUN_REQUESTED && this.clientId > request.srcId ) {
+            response.response = RunRequestResponse.NOT_OKAY;
+        } else {
+            response.response = RunRequestResponse.OKAY;
+        }
         this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
     };
 
     private onRunResponse = (response: RunResponse) => {
-        if (response.destId === this.clientId) {
-            this.log('Received response from ', response);
-            if (response.response === RunRequestResponse.OKAY) {
-                this.runResponseCount += 1;
-                if (this.runResponseCount === (this.activePeers.size - 1)) {
-                    this.log('Running the request.');
-                    this.currentRunStatus = RUNNING;
-                }
-            } else {
-                this.runResponseCount = 0;
-                this.log('Run request failed.', this.users[response.srcId] + ' denied the request.');
-            }
+        if (response.destId !== this.clientId) {
+            return;
+        }
+        this.log('Received response from', this.getScreenName(response.srcId));
+        this.debug('Response is', response);
+        if (response.response !== RunRequestResponse.OKAY) {
+            this.log('Run request failed.', this.getScreenName(response.srcId), ' denied the request.');
+            this.runResponseCount = 0;
+            this.currentRunStatus = RUN_NOT_REQUESTED;
+            return;
+        }
+        this.runResponseCount += 1;
+        if (this.canChangeStatusToRunning()) {
+            this.currentRunStatus = RUNNING;
+            this.log('Running the request.');
         }
     };
+
+    private canChangeStatusToRunning(): boolean {
+        return this.runResponseCount === (this.activePeers.size - 1);
+    }
 
     private getScreenName(userId: string): string {
         return this.users.get(userId).getName().getValue();
@@ -610,8 +631,6 @@ export class PadModel {
     };
 
     private runRequestBroadcast = (request: RunRequest) => {
-        this.runResponseCount = 0;
-        this.currentRunStatus = RUN_REQUESTED;
         this.signaler.emit(RunRequest.messageType, request);
     };
 
