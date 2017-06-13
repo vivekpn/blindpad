@@ -80,6 +80,8 @@ export class PadModel {
 
     private runResponseCount: number = 0;
     private currentRunStatus: RunStatus = RUN_NOT_REQUESTED;
+    private pendingRunRequest: boolean = false;
+    private pendingRequest: RunRequest;
 
     constructor(
         private padId: string,
@@ -289,6 +291,24 @@ export class PadModel {
         return this.lastRunContent;
     }
 
+    isTherePendingRequest(): boolean {
+        return this.pendingRunRequest;
+    }
+
+    setPendingRequest(value: boolean) {
+        this.pendingRunRequest = value;
+    }
+
+    userInputResponse(runReqResponse: RunRequestResponse) {
+        let response = new RunResponse();
+        response.srcId = this.clientId;
+        response.padId = this.pendingRequest.padId;
+        response.destId = this.pendingRequest.srcId;
+        response.requestTime = this.pendingRequest.time;
+        response.response = runReqResponse;
+        this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
+    }
+
     /* private methods */
 
     private updateUsers(actives: string[], deads: string[]) {
@@ -381,15 +401,29 @@ export class PadModel {
         response.padId = request.padId;
         response.destId = request.srcId;
         response.requestTime = request.time;
+        this.pendingRequest = request;
         if (this.currentRunStatus === RUNNING) {
             response.response = RunRequestResponse.NOT_OKAY;
-        } else if ( this.currentRunStatus === RUN_REQUESTED && this.clientId > request.srcId ) {
-            response.response = RunRequestResponse.NOT_OKAY;
-        } else {
-            response.response = RunRequestResponse.OKAY;
+            this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
+            return;
         }
-        this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
+        if ( this.currentRunStatus === RUN_REQUESTED && this.clientId > request.srcId ) {
+            response.response = RunRequestResponse.NOT_OKAY;
+            this.outgoingUserBroadcasts.next({ type: RunResponse.messageType, data: response});
+            return;
+        }
+        this.pendingRunRequest = true;
+        // Wait for the user input
+
+        setTimeout(this.automaticMessageSendAfterTimeout.bind(this), 5000);
     };
+
+    private automaticMessageSendAfterTimeout() {
+        if (this.isTherePendingRequest()) {
+            this.setPendingRequest(false);
+            this.userInputResponse(RunRequestResponse.OKAY);
+        }
+    }
 
     private onRunResponse = (response: RunResponse) => {
         if (response.destId !== this.clientId) {

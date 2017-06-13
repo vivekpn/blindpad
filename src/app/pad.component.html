@@ -152,6 +152,11 @@
             </pad-users>
         </pad-toolbar>
         <editor [pad]="getPad()"></editor>
+        <div [@fadeInOut] *ngIf="hasPad() && isTherePendingRequest()" style="width: 15pc">
+            A user has requested for a run. Are you okay or not okay?
+            <button (click)="userSelectedValue('NOT_OKAY')"> Not Okay </button>
+            <button (click)="userSelectedValue('OKAY')"> Okay </button>
+        </div>
         <div [@fadeInOut] *ngIf="hasPad() && isChatEnabled()" style="width: 15pc">
             <textarea readonly style="width: 15pc; height: 20pc">{{getChatHistory()}}</textarea>
             <input placeholder="Your message" #name/>

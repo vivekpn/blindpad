@@ -15,6 +15,7 @@ import { getDescribedNoun } from '../util/Names';
 import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
 import { RunStatus } from '../services/PadModel';
+// import {RunResponse} from "../signaler/Protocol";
 
 enum PadView {
     Welcome,
@@ -171,6 +172,10 @@ export class PadComponent implements OnInit, OnDestroy {
         this.view = PadView.Welcome;
     }
 
+    isTherePendingRequest(): boolean {
+        return this.getPad().isTherePendingRequest();
+    }
+
     startAudioSetup(): void {
         let initFailure = this.media.getLocalStream().subscribe(null, error => {
             this.view = PadView.Welcome;
@@ -209,6 +214,16 @@ export class PadComponent implements OnInit, OnDestroy {
             this.blindpadService.setPadId(this.randomPadId);
             this.blindpadService.startPad();
             this.router.navigate(['/pad', this.randomPadId]);
+        }
+    }
+
+    userSelectedValue(runresponse: any) {
+        this.getPad().setPendingRequest(false);
+        this.getPad().log(runresponse);
+        if (runresponse === 'OKAY') {
+            // Do something
+        } else {
+            // Do something else
         }
     }
 
