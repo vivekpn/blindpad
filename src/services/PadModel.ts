@@ -32,6 +32,14 @@ const COMPACTION_DELAY_MS = 4000;
 const PEER_TIMEOUT_POLL_MS = 5000;
 const COMPACTION_POLL_MS = 1000;
 
+export interface RunStatus {
+    name: string;
+}
+
+const RUN_NOT_REQUESTED: RunStatus = {name: 'Run'};
+const RUN_REQUESTED: RunStatus = {name: 'Requested'};
+const RUNNING: RunStatus = {name: 'Running'};
+
 export class PadModel {
     chatHistory: string = '';
 
@@ -67,6 +75,9 @@ export class PadModel {
 
     private peerTimeoutSub: Subscription;
     private compactionSub: Subscription;
+
+    private runResponseCount: number = 0;
+    private currentRunStatus: RunStatus = RUN_NOT_REQUESTED;
 
     constructor(
         private padId: string,
@@ -249,6 +260,10 @@ export class PadModel {
         this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
     }
 
+    getCurrentRunStatus(): RunStatus {
+        return this.currentRunStatus;
+    }
+
     /* private methods */
 
     private updateUsers(actives: string[], deads: string[]) {
@@ -346,7 +361,19 @@ export class PadModel {
     };
 
     private onRunResponse = (response: RunResponse) => {
-        this.log('Received response from ', response);
+        if (response.destId === this.clientId) {
+            this.log('Received response from ', response);
+            if (response.response === RunRequestResponse.OKAY) {
+                this.runResponseCount += 1;
+                if (this.runResponseCount === (this.activePeers.size - 1)) {
+                    this.log('Running the request.');
+                    this.currentRunStatus = RUNNING;
+                }
+            } else {
+                this.runResponseCount = 0;
+                this.log('Run request failed.', this.users[response.srcId] + ' denied the request.');
+            }
+        }
     };
 
     private getScreenName(userId: string): string {
@@ -583,6 +610,8 @@ export class PadModel {
     };
 
     private runRequestBroadcast = (request: RunRequest) => {
+        this.runResponseCount = 0;
+        this.currentRunStatus = RUN_REQUESTED;
         this.signaler.emit(RunRequest.messageType, request);
     };
 

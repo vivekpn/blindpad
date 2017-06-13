@@ -133,7 +133,7 @@
     <pad-header>
         <bp-logo routerLink="/">blind<span class="primary">pad</span></bp-logo>
         <nav *ngIf="hasPad()">
-            <button style="width: 10pc" (click)="run()"> Run </button>
+            <button style="width: 10pc" (click)="run()"> {{getRunCurrentStatus().name}} </button>
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
             <a class="invert" routerLink="/about">about</a>

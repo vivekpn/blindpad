@@ -14,6 +14,7 @@ import { UserModel } from '../services/UserModel';
 import { getDescribedNoun } from '../util/Names';
 import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
+import { RunStatus } from '../services/PadModel';
 
 enum PadView {
     Welcome,
@@ -31,6 +32,7 @@ enum PadView {
         '(document:click)': 'onDocumentClick($event)'
     }
 })
+
 export class PadComponent implements OnInit, OnDestroy {
     chatEnabled: boolean = true;
     PadView = PadView;
@@ -98,6 +100,10 @@ export class PadComponent implements OnInit, OnDestroy {
         const pad = this.getPad();
         if (!pad) return null;
         return getModeForMime(pad.getMimeType().value);
+    }
+
+    getRunCurrentStatus(): RunStatus {
+        return this.getPad().getCurrentRunStatus();
     }
 
     onModeButtonClick() {
