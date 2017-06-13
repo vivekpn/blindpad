@@ -23,7 +23,6 @@ import { interval } from '../util/Observables';
 import { SeededRandom } from '../util/Random';
 import { debounce } from '../util/Debounce';
 import { RunRequest } from '../signaler/Protocol';
-// import {timeout} from 'rxjs/operator/timeout';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -271,10 +270,15 @@ export class PadModel {
         // In case of timeout do default
         this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
         if (this.canChangeStatusToRunning()) {
-            this.currentRunStatus = RUNNING;
-            this.log('Running the request.');
-            this.lastRunContent = this.getEditorContent();
+            this.executeRun();
         }
+    }
+
+    executeRun() {
+        this.currentRunStatus = RUNNING;
+        this.log('Running the request.');
+        this.lastRunContent = this.getEditorContent();
+        this.currentRunStatus = RUN_NOT_REQUESTED;
     }
 
     getCurrentRunStatus(): RunStatus {
@@ -401,9 +405,7 @@ export class PadModel {
         }
         this.runResponseCount += 1;
         if (this.canChangeStatusToRunning()) {
-            this.currentRunStatus = RUNNING;
-            this.log('Running the request.');
-            this.lastRunContent = this.getEditorContent();
+            this.executeRun();
         }
     };
 
