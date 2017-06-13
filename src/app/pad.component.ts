@@ -138,6 +138,10 @@ export class PadComponent implements OnInit, OnDestroy {
         this.visibleModeChoices = null;
     }
 
+    getLastRunContent(): string {
+        return this.getPad().getLastRunContent();
+    }
+
     onChatSendClick(message: string) {
         if (message.trim().length === 0) {
             this.getPad().log('Message is empty. Chat message send failed.');

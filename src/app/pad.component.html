@@ -163,4 +163,5 @@
             <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
         </div>
     </pad-body>
+    <iframe *ngIf="hasPad()" srcdoc="{{getLastRunContent()}}" id="preview"> </iframe>
 </pad-page>

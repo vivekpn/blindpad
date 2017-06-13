@@ -69,6 +69,8 @@ export class PadModel {
     private localCursors: Subject<CursorMap>;
     private remoteCursors: Subject<CursorMap>;
 
+    private lastRunContent: string;
+
     private chatmessage: Subject<Message>;
 
     private debouncedPadUpdate: () => void;
@@ -127,6 +129,12 @@ export class PadModel {
 
     getMimeType(): BehaviorSubject<string> { return this.mimeType; }
     setMimeType(mime: string) { if (mime !== this.mimeType.value) this.mimeType.next(mime); }
+
+    getEditorContent(): string {
+        // Write the stub to run the code.
+        // this.log('Printing the contents of the editor', this.doc);
+        return this.doc.toArray().join('');
+    }
 
     buildPadUpdate(isLightweight = true): PadUpdate {
         const update = new PadUpdate();
@@ -265,11 +273,16 @@ export class PadModel {
         if (this.canChangeStatusToRunning()) {
             this.currentRunStatus = RUNNING;
             this.log('Running the request.');
+            this.lastRunContent = this.getEditorContent();
         }
     }
 
     getCurrentRunStatus(): RunStatus {
         return this.currentRunStatus;
+    }
+
+    getLastRunContent(): string {
+        return this.lastRunContent;
     }
 
     /* private methods */
@@ -390,6 +403,7 @@ export class PadModel {
         if (this.canChangeStatusToRunning()) {
             this.currentRunStatus = RUNNING;
             this.log('Running the request.');
+            this.lastRunContent = this.getEditorContent();
         }
     };
 
