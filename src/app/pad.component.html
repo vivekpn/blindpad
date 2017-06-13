@@ -1,13 +1,11 @@
 <welcome-modal [@fadeInOut] *ngIf="getView() == PadView.Welcome">
     <modal-body>
-        <h1>blindpad is an <a href="https://www.github.com/blindpad/blindpad">open source</a> shared peer-to-peer text editor
-            for collaborating on code and technical documents.</h1>
         <div *ngIf="media.needsCalibration() && browserIsSupported()">
             <button (click)="startAudioSetup()">Setup Voice</button>
             <button class="opt-out-button text invert" (click)="optOutOfVoice()">I don't want to use voice chat.</button>
         </div>
         <div *ngIf="!media.needsCalibration() && browserIsSupported()">
-            <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you.</p>
+            {{joinPad()}}
             <button (click)="joinPad()">
                 <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
                 <span *ngIf="!hasPad()">Start a new pad</span>
@@ -134,9 +132,6 @@
         <bp-logo routerLink="/">blind<span class="primary">pad</span></bp-logo>
         <nav *ngIf="hasPad()">
             <button style="width: 10pc" (click)="run()"> {{getRunCurrentStatus().name}} </button>
-            <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
-            <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
-            <a class="invert" routerLink="/about">about</a>
             <a class="chat-button" (click)="toggleChatEnable()">chat</a>
             <button class="mode-button" *ngIf="!!getPadMode()" (click)="onModeButtonClick()">
                 {{ getPadMode().name }}

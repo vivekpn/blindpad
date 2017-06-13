@@ -9,7 +9,7 @@
   height: 100%;
 
   bp-logo {
-    display: block;
+    display: none;
     color: $color-primary-text;
     @include image-text();
     cursor: pointer;
@@ -63,7 +63,7 @@
       align-items: center;
 
       bp-logo {
-        display: inline;
+        display: none;
         margin-left: 8px;
         font-size: 14pt;
       }

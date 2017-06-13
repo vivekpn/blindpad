@@ -142,7 +142,7 @@ export class MediaService {
         this.optOut = true;
         this.ensureUserMediaClosed();
     }
-    isOptOut() { return this.optOut; }
+    isOptOut() { return true; }
 
     getIsMuted(): BehaviorSubject<boolean> { return this.isMuted; }
     setIsMuted(muted: boolean) { this.isMuted.next(!!muted); }
