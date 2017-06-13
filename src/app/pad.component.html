@@ -133,6 +133,7 @@
     <pad-header>
         <bp-logo routerLink="/">blind<span class="primary">pad</span></bp-logo>
         <nav *ngIf="hasPad()">
+            <button style="width: 10pc" (click)="run()"> Run </button>
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
             <a class="invert" routerLink="/about">about</a>
@@ -160,7 +161,6 @@
             <textarea readonly style="width: 15pc; height: 20pc">{{getChatHistory()}}</textarea>
             <input placeholder="Your message" #name/>
             <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
-            <button style="width: 10pc" (click)="run()"> Run </button>
         </div>
     </pad-body>
 </pad-page>
