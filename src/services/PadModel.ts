@@ -345,6 +345,7 @@ export class PadModel {
     }
 
     private onLocalEdits = (edits: PadEdit[]) => {
+        let starttime = Date.now();
         if (!edits || edits.length === 0) return;
         const newOps: Op[] = [];
         edits.forEach(edit => {
@@ -367,6 +368,11 @@ export class PadModel {
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
             this.firePadUpdate(false);
         }
+        let endtime = Date.now();
+        let duration = endtime - starttime;
+        this.log('Time for local edit caluculations=' + duration );
+        this.log('Starttime=' + starttime + 'Endtime=' + endtime);
+
     };
 
     private onChatMessage = (message: ChatMessage) => {
@@ -375,7 +381,7 @@ export class PadModel {
     };
 
     private onRunRequest = (request: RunRequest) => {
-        this.log('Received run request:', request);
+        this.log('Received run request:' + request + 'time is ' + Date.now());
         let response = new RunResponse();
         response.srcId = this.clientId;
         response.padId = request.padId;
@@ -420,6 +426,7 @@ export class PadModel {
 
     private onPadUpdate = (update: PadUpdate) => {
         this.log('Received update: ', update);
+        let starttime = Date.now();
         if (update.mimeType !== undefined && update.mimeType !== this.mimeType.value) {
             this.mimeType.next(update.mimeType);
         }
@@ -469,6 +476,9 @@ export class PadModel {
             });
             this.remoteCursors.next(newCursors);
         }
+        let endtime = Date.now();
+        let duration = endtime - starttime;
+        this.log('Time for patching caluculations=' + duration );
 
     };
 
@@ -542,7 +552,7 @@ export class PadModel {
 
     private sendUpdateNow(isLightweight: boolean) {
         let temp =  this.buildPadUpdate(isLightweight);
-        this.log('Sending update : ', temp);
+        this.log('Sending update : ' + temp + 'time now is' + Date.now());
         this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: temp });
     }
 
