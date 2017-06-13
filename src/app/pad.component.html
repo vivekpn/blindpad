@@ -157,7 +157,7 @@
             </pad-users>
         </pad-toolbar>
         <editor [pad]="getPad()"></editor>
-        <div [@fadeInOut] *ngIf="isChatEnabled()" style="width: 15pc">
+        <div [@fadeInOut] *ngIf="hasPad() && isChatEnabled()" style="width: 15pc">
             <textarea readonly style="width: 15pc; height: 20pc">{{getChatHistory()}}</textarea>
             <input placeholder="Your message" #name/>
             <button (click)="onChatSendClick(name.value); name.value=''"> Send </button>
