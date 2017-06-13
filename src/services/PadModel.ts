@@ -270,12 +270,12 @@ export class PadModel {
         // In case of timeout do default
         this.outgoingUserBroadcasts.next({ type: RunRequest.messageType, data: runReq});
         if (this.canChangeStatusToRunning()) {
-            this.executeRun();
+            this.currentRunStatus = RUNNING;
+            setTimeout(this.executeRun.bind(this), 5000);
         }
     }
 
     executeRun() {
-        this.currentRunStatus = RUNNING;
         this.log('Running the request.');
         this.lastRunContent = this.getEditorContent();
         this.currentRunStatus = RUN_NOT_REQUESTED;
@@ -405,7 +405,8 @@ export class PadModel {
         }
         this.runResponseCount += 1;
         if (this.canChangeStatusToRunning()) {
-            this.executeRun();
+            this.currentRunStatus = RUNNING;
+            setTimeout(this.executeRun.bind(this), 5000);
         }
     };
 
