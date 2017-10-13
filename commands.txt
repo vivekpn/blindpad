@@ -1,0 +1,41 @@
+ 1996  git clone https://github.com/vivekpn/collaborative-workspaces.git
+ 1997  cd collaborative-workspaces/
+ 1999  npm install
+ 2000  sudo apt-get update
+ 2001  sudo apt-get install nodejs
+ 2002  sudo apt-get install npm
+ 2004  sudo npm install npm -g
+ 2005  npm install
+ 2006  node --version
+ 2007  ng --version
+ 2008  node -v
+ 2009  sudo apt-get install nodejs
+ 2010  nodejs -v
+ 2011  which node
+ 2012  which nodejs
+ 2013  nodejs --version
+ 2014  npm list
+ 2015  npm -v
+ 2016  sudo npm install -g n
+ 2017  sudo n latest
+ 2018  npm -v
+ 2019  npm install
+ 2020  ng --version
+ 2021  npm install ng
+ 2022  ng --version
+ 2023  npm install
+ 2024  npm run dev-app
+ 2025  npm install
+ 2026  npm install webpack-dev-server
+ 2027  npm run dev-app
+ 2029  ls src/app/
+ 2030  gedit src/app/pad.component.ts 
+ 2031  gedit .gitignore 
+ 2032  npm run dev-app
+ 2033  gedit .gitignore 
+ 2034  npm update
+ 2035  npm run dev-app
+ 2036  npm rebuild node-sass
+ 2037  npm install
+ 2038  npm run dev-app
+ 2039  history > commands.txt
